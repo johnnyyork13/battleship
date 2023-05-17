@@ -40,6 +40,7 @@ class Gameboard {
         this.e = e;
         this.placingShips = true;
         this.isTurn = false;
+        this.gameStarted = false;
         //ships
         this.shipCount = 4;
         this.carrier = new Ship(5);
@@ -62,26 +63,31 @@ class Gameboard {
 
     showShipForPlacement(ship, coords) {
         if (this.placingShips && !this.isComputer) {
-            let hoverColor = 'rgb(255, 144, 144)';
+            let hoverColor = 'var(--hover)';
             for (let y = 0; y < this.board.length; y++) {
                 for (let x = 0; x < this.board[y].length; x++) {
                     if (ship.orientation === 'x') {
                         if ((x >= coords[0] && x < coords[0] + ship.length &&
-                                y === coords[1]) && this.e.children[y].children[x].style.backgroundColor !== 'red') {
+                                y === coords[1]) && this.e.children[y].children[x].style.backgroundColor !== 'var(--ship)') {
                                 this.e.children[y].children[x].style.backgroundColor = hoverColor;
                         } else if ((x < coords[0] || x >= coords[0] + ship.length ||
-                                    y !== coords[1]) && this.e.children[y].children[x].style.backgroundColor !== 'red') {
-                                        this.e.children[y].children[x].style.backgroundColor = 'white';
+                                    y !== coords[1]) && this.e.children[y].children[x].style.backgroundColor !== 'var(--ship)' ) {
+                                        this.e.children[y].children[x].style.backgroundColor = 'var(--default)';
                         }
                     } else {
                         if ((x === coords[0] && y >= coords[1] && y < coords[1] + ship.length) &&
-                            this.e.children[y].children[x].style.backgroundColor !== 'red') {
+                            this.e.children[y].children[x].style.backgroundColor !== 'var(--ship)') {
                             this.e.children[y].children[x].style.backgroundColor = hoverColor;
                         } else if ((x !== coords[0] || y < coords[1] || y >= coords[1] + ship.length) &&
-                            this.e.children[y].children[x].style.backgroundColor !== 'red') {
-                            this.e.children[y].children[x].style.backgroundColor = 'white';
+                            this.e.children[y].children[x].style.backgroundColor !== 'var(--ship)') {
+                            this.e.children[y].children[x].style.backgroundColor = 'var(--default)';
                         }
                     }
+                    if (!this.isComputer && !this.board[y][x].isPlaceable &&
+                         !this.board[y][x].isShip && this.placingShips) {
+                        this.e.children[y].children[x].style.backgroundColor = 'var(--bg)';
+                    }
+                   
                 }
             }
         }
@@ -222,8 +228,8 @@ class Gameboard {
     }
 
     draw(e) {
-        let defaultBackground = 'white';
-        let shipBackground = 'red';
+        let defaultBackground = 'var(--default)';
+        let shipBackground = 'var(--ship)';
 
         for (let y = 0; y < this.board.length; y++) {
             let row = document.createElement('div');
@@ -246,15 +252,31 @@ class Gameboard {
         if (!this.gameOver) {
             for (let y = 0; y < this.board.length; y++) {
                 for (let x = 0; x < this.board[y].length; x++) {
-                    (this.board[y][x].isShip) ? this.e.children[y].children[x].style.backgroundColor = 'red' :
-                                                    this.e.children[y].children[x].style.backgroundColor = 'white';
-                    if (this.board[y][x].isHit) {
-                        this.e.children[y].children[x].style.backgroundColor = 'blue';
+                    if (!this.isComputer) {
+                        if (this.board[y][x].isShip) {
+                            this.e.children[y].children[x].style.backgroundColor = 'var(--ship)';
+                        }
                     }
-                    //draw unplaceable green for testing
-                    // if(this.board[y][x].isPlaceable) {
-                    //     e.children[y].children[x].style.backgroundColor = 'green';
-                    // }
+                    if (this.board[y][x].isShip && this.board[y][x].isHit) {
+                        this.e.children[y].children[x].style.backgroundColor = 'var(--enemy-hit)';
+                    }
+                    if (this.board[y][x].isHit && !this.board[y][x].isShip) {
+                        this.e.children[y].children[x].style.backgroundColor = 'var(--miss)';
+                    }
+                    if (!this.board[y][x].isPlaceable && !this.board[y][x].isShip && this.placingShips) {
+                        this.e.children[y].children[x].style.backgroundColor = 'var(--bg)';
+                    }
+                }
+                    
+            }
+        }
+    }
+
+    clearPlaceable() {
+        for (let y = 0; y < 10; y++) {
+            for (let x = 0; x < 10; x++) {
+                if (!this.board[y][x].isPlaceable && !this.board[y][x].isShip) {
+                    this.e.children[y].children[x].style.backgroundColor = 'var(--default)';
                 }
             }
         }
@@ -275,8 +297,6 @@ class Gameboard {
                             this.gameOver = this.checkShips();
                             if (this.gameOver && this.isComputer) {
                                 console.log("Player Wins");
-                            } else if (this.gameOver && !this.isComputer) {
-                                console.log('Computer Wins');
                             }
                         }
                         
