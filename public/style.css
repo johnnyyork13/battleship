@@ -8,7 +8,7 @@ html {
     height: 100%;
     margin: 0;
     --ship: #172554;
-    --hover: #60a5fa;
+    --hover: #93c5fd;
     --bg: #60a5fa;
     --dark: #1e3a8a;
     --default: #dbeafe;
@@ -26,12 +26,21 @@ body {
     background-color: var(--bg);
     font-family: header;
     color: var(--ship);
+    position: relative;
 }
 
 h1 {
     margin: 0;
     margin-top: 20px;
     font-size: 4em;
+}
+
+#placeShipHeader {
+    z-index: 4;
+    position: relative;
+    margin: 0;
+    margin-top: 10px;
+    font-size: 3em;
 }
 
 #mainContainer {
@@ -42,11 +51,11 @@ h1 {
     flex-direction: column;
     align-items: center;
     position: relative;
-    z-index: 0;
+    z-index: 1;
 }
 
 #playerGrid {
-    z-index: 1;
+    z-index: 2;
 }
 
 #computerGrid {
@@ -55,16 +64,30 @@ h1 {
     visibility: hidden;
 }
 
+#orientationBtn, #startBtn, #restartBtn {
+    background-color: var(--miss);
+    color: var(--dark);
+    font-weight: bolder;
+    border: 2px solid var(--dark);
+}
+
+#orientationBtn:hover, #startBtn:hover, #restartBtn:hover {
+    background-color: var(--default);
+    cursor: pointer;
+}
+
 #orientationBtn {
-    margin-bottom: 20px;
+    margin-bottom: 30px;
     width: 200px;
     height: 50px;
+    font-size: 1.3em;
 }
 
 #startBtn {
     margin-top: 20px;
-    width: 100px;
-    height: 30px;
+    width: 140px;
+    height: 40px;
+    font-size: 1.1em;
 }
 
 .row {
@@ -80,4 +103,35 @@ h1 {
 
 .ship {
     background-color: red;
+}
+
+#victoryCover {
+    position: absolute;
+    z-index: 3;
+    width: 100%;
+    height: 100%;
+    background-color: var(--dark);
+    opacity: .5;
+    visibility: hidden;
+}
+
+#victoryMsg {
+    visibility: hidden;
+    position: absolute;
+    top: 40%;
+    color: white;
+    z-index: 4;
+    font-size: 3em;
+}
+
+#restartBtn {
+    visibility: hidden;
+    position: absolute;
+    top: 45%;
+    z-index: 4;
+    width: 150px;
+    height: 40px;
+    margin-top: 80px;
+    font-size: 1.2em;
+    font-weight: bolder;
 }

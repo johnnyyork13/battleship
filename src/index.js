@@ -2,6 +2,10 @@ const playerGrid = document.getElementById('playerGrid');
 const computerGrid = document.getElementById('computerGrid');
 const startBtn = document.getElementById('startBtn');
 const orientationBtn = document.getElementById('orientationBtn');
+const victoryCover = document.getElementById('victoryCover');
+const victoryMsg = document.getElementById('victoryMsg');
+const restartBtn = document.getElementById('restartBtn');
+const placeShipHeader = document.getElementById('placeShipHeader');
 
 const playerBoard = new Gameboard(playerGrid, false);
 const playerOne = new Player(playerBoard);
@@ -14,6 +18,24 @@ computerBoard.randomlyPlaceShips();
 let gameOver = false;
 // computer.randomAttack(playerBoard)
 
+function victory(pOne, computer) {
+    if (pOne.gameOver || computer.gameOver) {
+        victoryCover.style.visibility = 'visible';
+        victoryMsg.style.visibility = 'visible';
+        restartBtn.style.visibility = 'visible';
+    }
+
+    if (pOne.gameOver) {
+        victoryMsg.textContent = "Computer Wins!";
+    } else if (computer.gameOver) {
+        victoryMsg.textContent = 'Player Wins!';
+    }
+}
+
+restartBtn.addEventListener('click', function() {
+    location.reload();
+})
+
 function computerGridListeners() {
     for (let y = 0; y < 10; y++) {
         for (let x = 0; x < 10; x++) {
@@ -23,24 +45,22 @@ function computerGridListeners() {
                 if (!playerCheck) {
                     computer.randomAttack(playerBoard);
                 }
+                computerBoard.update();
+                victory(playerBoard, computerBoard);
             })
-        }
-    }
-}
-
-function playerGridListeners() {
-    for (let y = 0; y < 10; y++) {
-        for (let x = 0; x < 10; x++) {
-            const tile = computerGrid.children[y].children[x];
-            tile.addEventListener('mouseenter', function() {
-                if (computerBoard.board[y][x].isHit === false) {
-                    tile.style.backgroundColor = 'rgb(107, 104, 239)';
-                }
+            tile.addEventListener('mouseenter', () => {
+                if (!computerBoard.board[y][x].isShip ||
+                    !computerBoard.board[y][x].isHit) {
+                        tile.style.backgroundColor = 'var(--hover)';
+                    }
+                computerBoard.update();
             })
-            tile.addEventListener('mouseleave', function() {
-                if (computerBoard.board[y][x].isHit === false) {
-                    tile.style.backgroundColor = 'white';
-                }
+            tile.addEventListener('mouseleave', () => {
+                if (!computerBoard.board[y][x].isShip ||
+                    !computerBoard.board[y][x].isHit) {
+                        tile.style.backgroundColor = 'var(--default)';
+                    }
+                computerBoard.update();
             })
         }
     }
@@ -53,6 +73,8 @@ startBtn.addEventListener('click', function() {
         orientationBtn.style.visibility = 'hidden';
         computerGrid.style.visibility = 'visible';
         startBtn.style.visibility = 'hidden';
+        placeShipHeader.style.visibility = 'hidden';
+        placeShipHeader.style.position = 'absolute';
 
         computerBoard.clearPlaceable();
         playerBoard.clearPlaceable();
@@ -61,4 +83,3 @@ startBtn.addEventListener('click', function() {
 
 
 computerGridListeners();
-//playerGridListeners();

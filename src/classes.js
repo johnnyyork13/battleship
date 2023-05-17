@@ -295,9 +295,9 @@ class Gameboard {
                             this.isTurn = false;
                             this.update();
                             this.gameOver = this.checkShips();
-                            if (this.gameOver && this.isComputer) {
-                                console.log("Player Wins");
-                            }
+                            // if (this.gameOver && this.isComputer) {
+                            //     console.log("Player Wins");
+                            // }
                         }
                         
                     //setting up players ships
@@ -362,6 +362,11 @@ class Player {
                     this.savedAttack = this.nextAttack;
                 }
             } else {
+                console.log('right', this.isRight)
+                console.log('left', this.isLeft)
+                console.log('up', this.isUp)
+                console.log('down', this.isDown)
+                console.log('////////////////////////')
                 //console.log('subloop');
                 let x = this.nextAttack[0];
                 let y = this.nextAttack[1];
@@ -400,19 +405,19 @@ class Player {
                             this.nextAttack = this.savedAttack;
                             this.isUp = false;
                         }
-                } else if ((this.isDown && y > 0) ||
-                board.board[y + 1] !== undefined && !board.board[y+1][x].isHit) {
-                    y += 1;
-                    attackHit = board.receiveAttack([x, y]);
-                    if (attackHit) {
-                        this.isDown = true;
-                        this.nextAttack = [x,y];
-                    } else {
-                        this.nextAttack = this.savedAttack;
-                        this.isDown = false;
-                        this.gotAHit = false;
-                    }
-                } else {
+                } else if ((this.isDown && y < 9) ||
+                    board.board[y + 1] !== undefined && !board.board[y+1][x].isHit) {
+                        console.log('stuck here');
+                        y += 1;
+                        attackHit = board.receiveAttack([x, y]);
+                        if (attackHit) {
+                            this.isDown = true;
+                            this.nextAttack = [x,y];
+                        } else {
+                            this.nextAttack = this.savedAttack;
+                            this.isDown = false;
+                        }
+                } else if (!this.isRight && !this.isLeft && !this.isUp && !this.isDown) {
                     this.gotAHit = false;
                     this.isRight = true;
                     this.isLeft = true;
@@ -428,9 +433,9 @@ class Player {
 
         board.update()
         board.gameOver = board.checkShips();
-        if (board.gameOver) {
-            console.log('Computer Wins');
-        }
+        // if (board.gameOver) {
+        //     console.log('Computer Wins');
+        // }
     }
 
 }
