@@ -32,6 +32,7 @@ class Gameboard {
         this.clicked = [];
         this.hover = [];
         this.board = [];
+        this.boardSize = 10;
         this.init();
         this.draw(e);
         this.click(e)
@@ -49,10 +50,9 @@ class Gameboard {
     }
 
     init() {
-        let boardSize = 10;
-        for (let y = 0; y < boardSize; y++) {
+        for (let y = 0; y < this.boardSize; y++) {
             let newRow = [];
-            for (let x = 0; x < boardSize; x++) {
+            for (let x = 0; x < this.boardSize; x++) {
                 newRow.push({isShip: false, isHit: false, isPlaceable: true});
             }
             this.board.push(newRow);
@@ -85,35 +85,111 @@ class Gameboard {
             }
         }
     }
+
+    randomlyPlaceShips() {
+        while (this.shipCount >= 0) {
+            let randomX = Math.floor(Math.random() * 10);
+            let randomY = Math.floor(Math.random() * 10);
+            let ship = this.shipList[this.shipCount];
+            //randomly assign x or y orientation
+            let randomOrientation = Math.floor(Math.random() * 2);
+            if (randomOrientation === 1) {
+                ship.orientation = 'x';
+            } else {
+                ship.orientation = 'y';
+            }
+            if (randomX + ship.length > this.boardSize && ship.orientation === 'x') {
+                let overAmount = randomX + ship.length - 10;
+                randomX -= overAmount;
+            }
+            if (randomY + ship.length > this.boardSize && ship.orientation === 'y') {
+                let overAmount = randomY + ship.length - 10;
+                randomY -= overAmount;
+            }
+            this.placeShip(ship, [randomX, randomY]);
+        }
+        this.update(this.e);
+        this.placingShips = false;
+    }
+
     checkPlaceable(ship, coords) {
-        console.log(coords);
-        for (let y = 0; y < this.board.length; y++) {
-            for (let x = 0; x < this.board[y].length; x++) {
-                if (ship.orientation === 'x' && x >= coords[0] && x < coords[0] + ship.length &&
-                    y === coords[1]) {
-                        if (!this.board[y][x].isPlaceable || !this.board[y][x - 1].isPlaceable 
-                            || !this.board[y + 1][x].isPlaceable) {
-                                return false;
-                            }
+        let x = coords[0];
+        let y = coords[1];
+
+        //check ships with x orientation
+        if (ship.orientation === 'x') {
+            //check for ship on either end of range
+            if ((x > 0 && !this.board[y][x - 1].isPlaceable) ||
+                (x + ship.length < this.boardSize && !this.board[y][x + ship.length].isPlaceable)) {
+                return false;
+            }
+            //check for ship on x axis in range
+            for (let i = 0; i < ship.length; i++) {
+                if (!this.board[y][x + i].isPlaceable) {
+                    return false;
                 }
             }
         }
+
+        if (ship.orientation === 'y') {
+            //check for ship on either end of y axis range
+            if ((y > 0 && !this.board[y - 1][x].isPlaceable) || 
+            (y + ship.length < this.boardSize && !this.board[y + ship.length][x].isPlaceable)) {
+                return false;
+            } 
+
+            //check for ship on y axis in range
+            for (let i = 0; i < ship.length; i++) {
+                if (!this.board[y + i][x].isPlaceable) {
+                    return false;
+                }
+            }
+        }
+
         return true;
     }
 
     placeShip(ship, coords) {
         let placeable = this.checkPlaceable(ship, coords);
         if (placeable) {
-            for (let i = 0; i < ship.length; i++) {
-                if (ship.orientation === 'x') {
+            if (ship.orientation === 'x') {
+                if (coords[0] + ship.length < 10) {
+                    this.board[coords[1]][coords[0] + ship.length].isPlaceable = false;
+                }
+                if (coords[0] > 0) {
+                    this.board[coords[1]][coords[0] - 1].isPlaceable = false;
+                }
+                for (let i = 0; i < ship.length; i++) {
                     this.board[coords[1]][coords[0] + i].isShip = true;
-                    this.board[coords[1]][coords[0] + 1].isPlaceable = false;
-                } else {
+                    this.board[coords[1]][coords[0] + i].isPlaceable = false;
+                    if (coords[1] > 0) {
+                        this.board[coords[1] - 1][coords[0] + i].isPlaceable = false;
+                    }
+                    if (coords[1] < this.boardSize - 1) {
+                        this.board[coords[1] + 1][coords[0] + i].isPlaceable = false;
+                    }
+                }  
+            } else {
+                if (coords[1] + ship.length < this.boardSize) {
+                    this.board[coords[1] + ship.length][coords[0]].isPlaceable = false;
+                }
+                if (coords[1] > 0) {
+                    this.board[coords[1] - 1][coords[0]].isPlaceable = false;
+                }
+                for (let i = 0; i < ship.length; i++) {
                     this.board[coords[1] + i][coords[0]].isShip = true; 
-                    this.board[coords[1]][coords[0] + 1].isPlaceable = false;
+                    this.board[coords[1] + i][coords[0]].isPlaceable = false;
+                    if (coords[0] > 0) {
+                        this.board[coords[1] + i][coords[0] - 1].isPlaceable = false;
+                    }
+                    if (coords[0] < this.boardSize - 1) {
+                        this.board[coords[1] + i][coords[0] + 1].isPlaceable = false;
+                    }
                 }
             }
+            this.shipCount--;
         }
+
         
     }
 
@@ -174,11 +250,13 @@ class Gameboard {
                     if (this.board[y][x].isHit) {
                         e.children[y].children[x].style.backgroundColor = 'blue';
                     }
+                    //draw unplaceable green for testing
+                    // if(this.board[y][x].isPlaceable) {
+                    //     e.children[y].children[x].style.backgroundColor = 'green';
+                    // }
                 }
             }
         }
-        
-        this.gameOver = this.checkShips();
     }
 
     click(e) {
@@ -186,11 +264,16 @@ class Gameboard {
             for (let x = 0; x < this.board[y].length; x++) {
                 e.children[y].children[x].addEventListener('click', () => {
                     this.clicked = [x, y];
-                    if (!this.placingShips) {
+                    if (!this.placingShips && this.isComputer) {
                         this.receiveAttack(this.clicked);
                         this.update(e);
-                    } else {
-                        console.log(this.clicked);
+                        this.gameOver = this.checkShips();
+                        if (this.gameOver && this.isComputer) {
+                            console.log("Player Wins");
+                        } else if (this.gameOver && !this.isComputer) {
+                            console.log('Computer Wins');
+                        }
+                    } else if (this.placingShips && !this.isComputer) {
                         let placed = this.placeShip(this.shipList[this.shipCount], this.clicked);
                         this.update(this.e);
                         if (placed) {
@@ -212,30 +295,7 @@ class Gameboard {
         }
     }
 
-    randomlyPlaceShips() {
-        for (let i = 0; i <= this.shipCount; i++) {
-            let randomX = Math.floor(Math.random() * 9);
-            let randomY = Math.floor(Math.random() * 9);
-            let ship = this.shipList[i];
-            //randomly assign x or y orientation
-            let randomOrientation = Math.floor(Math.random() * 2);
-            if (randomOrientation === 1) {
-                ship.orientation = 'x';
-            } else {
-                ship.orientation = 'y';
-            }
-            if (randomX + ship.length > 9 ) {
-                let overAmount = randomX + ship.length - 9;
-                randomX -= overAmount;
-            }
-            if (randomY + ship.length > 9) {
-                let overAmount = randomY + ship.length - 9;
-                randomY -= overAmount;
-            }
-            this.placeShip(ship, [randomX, randomY]);
-        }
-        this.update(this.e);
-    }
+    
     
 }
 
