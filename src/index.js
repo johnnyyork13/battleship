@@ -1,8 +1,11 @@
 const playerGrid = document.getElementById('playerGrid');
+const computerGrid = document.getElementById('computerGrid');
 
-const playerBoard = new Gameboard(playerGrid);
+//const playerBoard = new Gameboard(playerGrid, false);
+//const playerOne = new Player(playerBoard);
 
-//test ship
-const testShip = new Ship(4);
+const computerBoard = new Gameboard(computerGrid, true);
+const computer = new Player(computerBoard);
 
-playerBoard.loadShip(testShip);
+computerBoard.randomlyPlaceShips();
+//main game loop

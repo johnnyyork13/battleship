@@ -25,11 +25,12 @@ body {
 }
 
 .tile {
+    margin: 1px;
     width: 50px;
     height: 50px;
     border: 1px solid black;
 }
 
-.hover {
+.ship {
     background-color: red;
 }
