@@ -39,6 +39,7 @@ class Gameboard {
         this.gameOver = false;
         this.e = e;
         this.placingShips = true;
+        this.isTurn = false;
         //ships
         this.shipCount = 4;
         this.carrier = new Ship(5);
@@ -108,7 +109,7 @@ class Gameboard {
             }
             this.placeShip(ship, [randomX, randomY]);
         }
-        this.update(this.e);
+        this.update();
         this.placingShips = false;
     }
 
@@ -241,14 +242,14 @@ class Gameboard {
         }
     }
 
-    update(e) {
+    update() {
         if (!this.gameOver) {
             for (let y = 0; y < this.board.length; y++) {
                 for (let x = 0; x < this.board[y].length; x++) {
-                    (this.board[y][x].isShip) ? e.children[y].children[x].style.backgroundColor = 'red' :
-                                                    e.children[y].children[x].style.backgroundColor = 'white';
+                    (this.board[y][x].isShip) ? this.e.children[y].children[x].style.backgroundColor = 'red' :
+                                                    this.e.children[y].children[x].style.backgroundColor = 'white';
                     if (this.board[y][x].isHit) {
-                        e.children[y].children[x].style.backgroundColor = 'blue';
+                        this.e.children[y].children[x].style.backgroundColor = 'blue';
                     }
                     //draw unplaceable green for testing
                     // if(this.board[y][x].isPlaceable) {
@@ -264,18 +265,25 @@ class Gameboard {
             for (let x = 0; x < this.board[y].length; x++) {
                 e.children[y].children[x].addEventListener('click', () => {
                     this.clicked = [x, y];
-                    if (!this.placingShips && this.isComputer) {
-                        this.receiveAttack(this.clicked);
-                        this.update(e);
-                        this.gameOver = this.checkShips();
-                        if (this.gameOver && this.isComputer) {
-                            console.log("Player Wins");
-                        } else if (this.gameOver && !this.isComputer) {
-                            console.log('Computer Wins');
+                    let attackHit = false;
+                    this.isTurn = true;
+                    if (!this.placingShips && !this.gameOver && this.isComputer) {
+                        attackHit = this.receiveAttack(this.clicked);
+                        if (attackHit) {
+                            this.isTurn = false;
+                            this.update();
+                            this.gameOver = this.checkShips();
+                            if (this.gameOver && this.isComputer) {
+                                console.log("Player Wins");
+                            } else if (this.gameOver && !this.isComputer) {
+                                console.log('Computer Wins');
+                            }
                         }
+                        
+                    //setting up players ships
                     } else if (this.placingShips && !this.isComputer) {
                         let placed = this.placeShip(this.shipList[this.shipCount], this.clicked);
-                        this.update(this.e);
+                        this.update();
                         if (placed) {
                             this.shipCount--;
                         }
@@ -306,14 +314,102 @@ class Player {
         this.board = gameboard.board;
         this.gameboard = gameboard;
         this.clicked = [0,0];
+        this.savedAttack = null;
+        this.nextAttack = null;
+        this.gotAHit = false;
+        this.randomY;
+        this.randomX;
+        this.foundShip = false;
+        this.isLeft = true;
+        this.isRight = true;
+        this.isUp = true;
+        this.isDown = true;
     }
 
-    startGame(coords) {
-        if (this.isTurn && this.shipCount >= 0) {
-            this.gameboard.placeShip(coords)
-            return true;
-        } else {
-            return false;
+    randomAttack(board) {
+        let attackHit = false;
+        let randomDirection = Math.floor(Math.random() * 4);
+
+        while (!attackHit && !board.gameOver) {
+            if (!this.gotAHit) {
+                console.log('mainloop');
+                this.randomX = Math.floor(Math.random() * 10);
+                this.randomY = Math.floor(Math.random() * 10);
+                this.nextAttack = [this.randomX, this.randomY];
+                attackHit = board.receiveAttack(this.nextAttack);
+                if (board.board[this.randomY][this.randomX].isShip) {
+                    this.gotAHit = true;
+                    this.savedAttack = this.nextAttack;
+                }
+            } else {
+                //console.log('subloop');
+                let x = this.nextAttack[0];
+                let y = this.nextAttack[1];
+                //got a hit so only shoot in adjacent blocks until ship sunk
+                //figure out if ship is x or y orientation
+                if ((this.isRight && x < 9) ||
+                    (board.board[y][x + 1] !== undefined && !board.board[y][x+1].isHit)) {
+                        x += 1;
+                        attackHit = board.receiveAttack([x, y]);
+                    if (attackHit && board.board[y][x].isShip) {
+                        this.isRight = true;
+                        this.nextAttack = [x, y];
+                    } else {
+                        this.nextAttack = this.savedAttack;
+                        this.isRight = false;
+                    }
+                } else if ((this.isLeft && x > 0) || 
+                    board.board[y][x - 1] !== undefined && !board.board[y][x-1].isHit) {
+                        x -= 1;
+                        attackHit = board.receiveAttack([x, y]);
+                    if (attackHit && board.board[y][x].isShip) {
+                        this.isLeft = true;
+                        this.nextAttack = [x, y];
+                    } else {
+                        this.nextAttack = this.savedAttack;
+                        this.isLeft = false;
+                    }
+                } else if ((this.isUp && y > 0) ||
+                    board.board[y - 1] !== undefined && !board.board[y-1][x].isHit) {
+                        y -= 1;
+                        attackHit = board.receiveAttack([x, y]);
+                        if (attackHit) {
+                            this.isUp = true;
+                            this.nextAttack = [x,y];
+                        } else {
+                            this.nextAttack = this.savedAttack;
+                            this.isUp = false;
+                        }
+                } else if ((this.isDown && y > 0) ||
+                board.board[y + 1] !== undefined && !board.board[y+1][x].isHit) {
+                    y += 1;
+                    attackHit = board.receiveAttack([x, y]);
+                    if (attackHit) {
+                        this.isDown = true;
+                        this.nextAttack = [x,y];
+                    } else {
+                        this.nextAttack = this.savedAttack;
+                        this.isDown = false;
+                        this.gotAHit = false;
+                    }
+                } else {
+                    this.gotAHit = false;
+                    this.isRight = true;
+                    this.isLeft = true;
+                    this.isUp = true;
+                    this.isDown = true;
+                }
+
+
+                
+            } 
+            
+        }
+
+        board.update()
+        board.gameOver = board.checkShips();
+        if (board.gameOver) {
+            console.log('Computer Wins');
         }
     }
 
