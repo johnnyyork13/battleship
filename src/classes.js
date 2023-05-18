@@ -41,6 +41,8 @@ class Gameboard {
         this.placingShips = true;
         this.isTurn = false;
         this.gameStarted = false;
+        this.revealShips = false;
+        this.shipCounter = document.getElementById('shipCounter');
         //ships
         this.shipCount = 5;
         this.carrier = new Ship(5);
@@ -59,6 +61,21 @@ class Gameboard {
                 newRow.push({isShip: false, isHit: false, isPlaceable: true});
             }
             this.board.push(newRow);
+        }
+    }
+
+    showShips() {
+        let foundShip = false;
+        let shipCount = 5;
+        //check x axis first
+        for (let y = 0; y < this.board.length; y++) {
+            for (let x = 0; x < this.board[y].length; x++) {
+                let tile = this.board[y][x];
+                if (tile.orientation === 'x') {
+                    console.log('test');
+                }
+                
+            }
         }
     }
 
@@ -171,6 +188,11 @@ class Gameboard {
         let placeable = this.checkPlaceable(ship, coords);
         if (placeable) {
             if (ship.orientation === 'x') {
+                if (!this.isComputer) {
+                    let shipImg = document.createElement('img');
+                    shipImg.src = `../assets/${this.shipCount}.png`;
+                    this.e.children[coords[1]].children[coords[0]].appendChild(shipImg);
+                }
                 if (coords[0] + ship.length < this.boardSize) {
                     this.board[coords[1]][coords[0] + ship.length].isPlaceable = false;
                 }
@@ -186,8 +208,14 @@ class Gameboard {
                     if (coords[1] < this.boardSize - 1) {
                         this.board[coords[1] + 1][coords[0] + i].isPlaceable = false;
                     }
+                    
                 }  
             } else {
+                if (!this.isComputer) {
+                    let shipImg = document.createElement('img');
+                    shipImg.src = `../assets/${this.shipCount}y.png`;
+                    this.e.children[coords[1]].children[coords[0]].appendChild(shipImg);
+                }
                 if (coords[1] + ship.length < this.boardSize) {
                     this.board[coords[1] + ship.length][coords[0]].isPlaceable = false;
                 }
@@ -205,6 +233,7 @@ class Gameboard {
                     }
                 }
             }
+            if (!this.isComputer ) this.shipCounter.textContent = `Ships Remaining: ${this.shipCount}`;
             this.shipCount--;
         }
 
@@ -284,12 +313,13 @@ class Gameboard {
     }
 
     update() {
-        if (!this.gameOver) {
+        if (!this.gameOver || !this.revealShips) {
             for (let y = 0; y < this.board.length; y++) {
                 for (let x = 0; x < this.board[y].length; x++) {
-                    if (!this.isComputer) {
+                    if (!this.isComputer || this.revealShips) {
                         if (this.board[y][x].isShip) {
                             this.e.children[y].children[x].style.backgroundColor = 'var(--ship)';
+                            this.e.children[y].children[x].classList.add('ship');
                         }
                     }
                     if (this.board[y][x].isShip && this.board[y][x].isHit) {
@@ -344,6 +374,7 @@ class Gameboard {
                         }
                         if (this.shipCount < 0) {
                             this.placingShips = false;
+                            this.shipCounter.style.visibility = 'hidden';
                         }
                     }
 
@@ -394,7 +425,7 @@ class Player {
                 this.isDown = true;
                 this.isLeft = true;
                 this.isRight = true;
-                console.log('mainloop');
+                //console.log('mainloop');
                 this.randomX = Math.floor(Math.random() * this.boardSize);
                 this.randomY = Math.floor(Math.random() * this.boardSize);
                 this.nextAttack = [this.randomX, this.randomY];
@@ -424,15 +455,15 @@ class Player {
                         if(attackHit && board.board[y][x+1].isShip){
                             this.orientation = 'x';
                             this.shipHitList.push([x+1, y]);
-                            console.log('right', ' one');
+                            //console.log('right', ' one');
                             this.isRight = true;
                             this.nextAttack = [x+1, y];
                         } else if (attackHit && !board.board[y][x+1].isShip) {
-                            console.log('right', ' two');
+                            //console.log('right', ' two');
                             this.nextAttack = this.savedAttack;
                             this.isRight = false;
                         } else if (!attackHit) {
-                            console.log('right', ' three');
+                            //console.log('right', ' three');
                             this.nextAttack = this.savedAttack;
                             this.isRight = false;
                         }
@@ -452,18 +483,18 @@ class Player {
                             if(attackHit && board.board[y][x-1].isShip){
                                 this.orientation = 'x';
                                 this.shipHitList.push([x-1, y]);
-                                console.log('left', ' one');
+                                //console.log('left', ' one');
                                 this.isLeft = true;
                                 this.nextAttack = [x-1, y];
                             } else if (attackHit && !board.board[y][x-1].isShip) {
-                                console.log('left', ' two');
+                                //console.log('left', ' two');
                                 this.nextAttack = this.savedAttack;
                                 this.isLeft = false;
                                 if (this.orientation === null) {
                                     this.orientation = 'y';
                                 }
                             } else if (!attackHit) {
-                                console.log('left', ' three');
+                                //console.log('left', ' three');
                                 this.nextAttack = this.savedAttack;
                                 this.isLeft = false;
                                 if (this.orientation === null) {
@@ -491,15 +522,15 @@ class Player {
                             this.isLeft = false;
                             if(attackHit && board.board[y+1][x].isShip){
                                 this.shipHitList.push([x, y+1]);
-                                console.log('down', ' one');
+                                //console.log('down', ' one');
                                 this.isDown = true;
                                 this.nextAttack = [x, y+1];
                             } else if (attackHit && !board.board[y+1][x].isShip) {
-                                console.log('down', ' two');
+                                //console.log('down', ' two');
                                 this.nextAttack = this.savedAttack;
                                 this.isDown = false;
                             } else if (!attackHit) {
-                                console.log('down', ' three');
+                                //console.log('down', ' three');
                                 this.nextAttack = this.savedAttack;
                                 this.isDown = false;
                         }
@@ -519,15 +550,15 @@ class Player {
                         this.isDown = false;
                         if(attackHit && board.board[y-1][x].isShip){
                             this.shipHitList.push([x, y-1]);
-                            console.log('up', ' one');
+                            //console.log('up', ' one');
                             this.isUp = true;
                             this.nextAttack = [x, y-1];
                         } else if (attackHit && !board.board[y-1][x].isShip) {
-                            console.log('up', ' two');
+                            //console.log('up', ' two');
                             this.nextAttack = this.savedAttack;
                             this.isUp = false;
                         } else if (!attackHit) {
-                            console.log('up', ' three');
+                            //console.log('up', ' three');
                             this.nextAttack = this.savedAttack;
                             this.isUp = false;
                         }

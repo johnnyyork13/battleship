@@ -7,6 +7,7 @@ const victoryMsg = document.getElementById('victoryMsg');
 const restartBtn = document.getElementById('restartBtn');
 const placeShipHeader = document.getElementById('placeShipHeader');
 
+
 const playerBoard = new Gameboard(playerGrid, false);
 const playerOne = new Player(playerBoard);
 
@@ -23,6 +24,8 @@ function victory(pOne, computer) {
         victoryCover.style.visibility = 'visible';
         victoryMsg.style.visibility = 'visible';
         restartBtn.style.visibility = 'visible';
+        //computerBoard.showShips();
+        //computerBoard.update();
     }
 
     if (pOne.gameOver) {
