@@ -37,8 +37,8 @@ restartBtn.addEventListener('click', function() {
 })
 
 function computerGridListeners() {
-    for (let y = 0; y < 10; y++) {
-        for (let x = 0; x < 10; x++) {
+    for (let y = 0; y < playerBoard.boardSize; y++) {
+        for (let x = 0; x < playerBoard.boardSize; x++) {
             const tile = computerGrid.children[y].children[x];
             tile.addEventListener('click', function() {
                 let playerCheck = computerBoard.isTurn;
