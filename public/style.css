@@ -30,6 +30,17 @@ body {
     position: relative;
 }
 
+audio {
+    visibility: hidden;
+}
+
+#musicContainer {
+    position: absolute;
+    right: 40px;
+    top: 10px;
+    cursor: pointer;
+}
+
 h1 {
     margin: 0;
     margin-top: 20px;
@@ -45,24 +56,71 @@ h1 {
 }
 
 #mainContainer {
+    margin-top: 50px;
     width: 80%;
-    height: 80%;
     display: flex;
-    justify-content: center;
-    flex-direction: column;
-    align-items: center;
     position: relative;
+    justify-content: center;
     z-index: 1;
+}
+
+#gridContainerAll {
+    height: 100%;
+    position: relative;
+    display: flex;
+}
+
+#vsP {
+    position: absolute;
+    visibility: hidden;
+    width: 50px;
+    margin: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5em;
+    font-weight: bolder;
+}
+
+.gridContainer {
+    text-align: center;
+}
+
+.gridName {
+    position: absolute;
+    top: -60px;
+    width: 537px;
+    text-align: center;
+    text-align: center;
 }
 
 #playerGrid {
     z-index: 2;
 }
 
-#computerGrid {
-    position: absolute;
-    right: 5%;
+#computerGridContainer {
     visibility: hidden;
+    position: absolute;
+}
+
+#btnContainer {
+    width: 20%;
+    padding: 20px;
+    margin-left: 20px;
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    align-items: center;
+    background-color: var(--default);
+    position: relative;
+    border: 1px solid var(--dark);
+}
+
+#nameBox {
+    height: 40px;
+    width: 183px;
+    padding-left: 10px;
+    font-size: 1.2em;
 }
 
 #orientationBtn, #startBtn, #restartBtn {
@@ -85,10 +143,11 @@ h1 {
 }
 
 #startBtn {
-    margin-top: 20px;
     width: 140px;
     height: 40px;
     font-size: 1.1em;
+    position: absolute;
+    bottom: 30px;
 }
 
 .row {
@@ -105,9 +164,8 @@ h1 {
 
 img {
     position: absolute;
+    left: 2px;
     z-index: 4;
-    margin-left: 5px;
-    margin-right: 5px;
 }
 
 #victoryCover {

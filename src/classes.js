@@ -43,6 +43,7 @@ class Gameboard {
         this.gameStarted = false;
         this.revealShips = false;
         this.shipCounter = document.getElementById('shipCounter');
+        this.audio = document.getElementById('cannonAudio');
         //ships
         this.shipCount = 5;
         this.carrier = new Ship(5);
@@ -357,6 +358,7 @@ class Gameboard {
                     if (!this.placingShips && !this.gameOver && this.isComputer) {
                         attackHit = this.receiveAttack(this.clicked, []);
                         if (attackHit) {
+                            this.audio.src = '../assets/cannon.mp3';
                             this.isTurn = false;
                             this.update();
                             this.gameOver = this.checkShips();

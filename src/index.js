@@ -1,5 +1,8 @@
 const playerGrid = document.getElementById('playerGrid');
+const playerName = document.getElementById('playerName');
+const vsP = document.getElementById('vsP');
 const computerGrid = document.getElementById('computerGrid');
+const computerGridContainer = document.getElementById('computerGridContainer');
 const startBtn = document.getElementById('startBtn');
 const orientationBtn = document.getElementById('orientationBtn');
 const victoryCover = document.getElementById('victoryCover');
@@ -7,7 +10,11 @@ const victoryMsg = document.getElementById('victoryMsg');
 const restartBtn = document.getElementById('restartBtn');
 const placeShipHeader = document.getElementById('placeShipHeader');
 const shipCounter = document.getElementById('shipCounter');
-
+const btnContainer = document.getElementById('btnContainer');
+const nameBox = document.getElementById('nameBox');
+const backgroundMusic = document.getElementById('backgroundMusic');
+const musicContainer = document.getElementById('musicContainer');
+const musicMute = document.getElementById('musicMute');
 
 const playerBoard = new Gameboard(playerGrid, false);
 const playerOne = new Player(playerBoard);
@@ -70,21 +77,50 @@ function computerGridListeners() {
     }
 }
 
-startBtn.addEventListener('click', function() {
-    if (!playerBoard.placingShips) {
-        playerGrid.style.position = 'absolute';
-        playerGrid.style.left = '5%';
-        orientationBtn.style.visibility = 'hidden';
-        computerGrid.style.visibility = 'visible';
-        startBtn.style.visibility = 'hidden';
-        placeShipHeader.style.visibility = 'hidden';
-        placeShipHeader.style.position = 'absolute';
-        shipCounter.style.visibility = 'hidden';
 
+startBtn.addEventListener('click', function() {
+    if (!playerBoard.placingShips && nameBox.value !== '') {
+        reduceVolume();
+        //playerName.style.visibility = 'visible';
+        //playerName.style.position = 'relative';
+        playerName.textContent = nameBox.value;
+        vsP.style.visibility = 'visible';
+        vsP.style.position = 'relative';
+        computerGridContainer.style.visibility = 'visible';
+        computerGridContainer.style.position = 'relative';
+        placeShipHeader.textContent = 'FIGHT!'
+        // placeShipHeader.style.visibility = 'hidden';
+        // placeShipHeader.style.position = 'absolute';
+        btnContainer.style.visibility = 'hidden';
+        btnContainer.style.position = 'absolute';
         computerBoard.clearPlaceable();
         playerBoard.clearPlaceable();
+    } else if (nameBox.value === '') {
+        nameBox.style.border = '2px solid red';
     }
 })
+
+let musicTimeout;
+function reduceVolume() {
+    backgroundMusic.volume -= 0.1;
+    if (backgroundMusic.volume >= 0.2) {
+        reduceVolume();
+    }
+}
+
+let isMuted = false;
+musicContainer.addEventListener('click', function() {
+    if (!isMuted) {
+        musicMute.src = '../assets/music-muted.png';
+        backgroundMusic.pause();
+        isMuted = true;
+    } else {
+        musicMute.src = '../assets/music-unmuted.png';
+        backgroundMusic.play();
+        isMuted = false;
+    }
+})
+
 
 
 computerGridListeners();
