@@ -36,9 +36,23 @@ audio {
 
 #musicContainer {
     position: absolute;
-    right: 40px;
-    top: 10px;
+    display: flex;
+    align-items: center;
+    right: 20px;
+    top: 0px;
     cursor: pointer;
+}
+
+#musicContainer p {
+    font-size: 1.4em;
+}
+
+#musicMute {
+    margin: 0 !important;
+    margin-left: 10px !important;  
+    position: relative !important;
+    width: 30px;
+    height: 30px;
 }
 
 h1 {

@@ -24,14 +24,14 @@ const computer = new Player(computerBoard);
 
 let gameOver = false;
 let musicTimeout;
-let isMuted = false;
+let isMuted = true;
 let cannonAudioSrc = '../assets/cannon.mp3';
 
 computerBoard.randomlyPlaceShips();
 //adjust audio and play bg music
-backgroundMusic.play();
+backgroundMusic.pause();
 cannonAudio.volume = .4;
-computerBoard.audioSrc = cannonAudioSrc;
+computerBoard.audioSrc = '';
 
 // computer.randomAttack(playerBoard)
 
