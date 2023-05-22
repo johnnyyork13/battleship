@@ -6,6 +6,7 @@ const victoryCover = document.getElementById('victoryCover');
 const victoryMsg = document.getElementById('victoryMsg');
 const restartBtn = document.getElementById('restartBtn');
 const placeShipHeader = document.getElementById('placeShipHeader');
+const shipCounter = document.getElementById('shipCounter');
 
 
 const playerBoard = new Gameboard(playerGrid, false);
@@ -78,6 +79,7 @@ startBtn.addEventListener('click', function() {
         startBtn.style.visibility = 'hidden';
         placeShipHeader.style.visibility = 'hidden';
         placeShipHeader.style.position = 'absolute';
+        shipCounter.style.visibility = 'hidden';
 
         computerBoard.clearPlaceable();
         playerBoard.clearPlaceable();

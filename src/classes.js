@@ -374,7 +374,6 @@ class Gameboard {
                         }
                         if (this.shipCount < 0) {
                             this.placingShips = false;
-                            this.shipCounter.style.visibility = 'hidden';
                         }
                     }
 
