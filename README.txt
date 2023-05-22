@@ -3,7 +3,7 @@ A Battleship style game written in JavaScript.
 Players can challenge my AI that I have dubbed BattleBot 
 to a game of luck and wits to sink all of each others ships. 
 
-The game can be tested and played on my GitHub pages at:
+The game can be tested and played on my GitHub page at:
 https://johnnyyork13.github.io/battleship/public/index.html
 
 
