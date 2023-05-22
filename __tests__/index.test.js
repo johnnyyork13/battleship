@@ -1,4 +1,4 @@
-const {Ship, Gameboard, Player} = require('../src/classes');
+const {Ship, Gameboard, Player} = require('../src/classesTests');
 
 test('If the ship can sink', () => {
     const myShip = new Ship(3);

@@ -7,7 +7,6 @@ The game can be tested and played on my GitHub pages at:
 https://johnnyyork13.github.io/battleship/public/index.html
 
 
-
 Credits and such:
 
 Battleship Artwork:
