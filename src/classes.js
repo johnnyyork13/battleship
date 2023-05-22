@@ -44,6 +44,7 @@ class Gameboard {
         this.revealShips = false;
         this.shipCounter = document.getElementById('shipCounter');
         this.audio = document.getElementById('cannonAudio');
+        this.audioSrc;
         //ships
         this.shipCount = 5;
         this.carrier = new Ship(5);
@@ -348,6 +349,10 @@ class Gameboard {
         }
     }
 
+    cannonSound() {
+        this.audio.src = this.audioSrc;
+    }
+
     click(e) {
         for (let y = 0; y < this.board.length; y++) {
             for (let x = 0; x < this.board[y].length; x++) {
@@ -358,7 +363,7 @@ class Gameboard {
                     if (!this.placingShips && !this.gameOver && this.isComputer) {
                         attackHit = this.receiveAttack(this.clicked, []);
                         if (attackHit) {
-                            this.audio.src = '../assets/cannon.mp3';
+                            this.cannonSound();
                             this.isTurn = false;
                             this.update();
                             this.gameOver = this.checkShips();

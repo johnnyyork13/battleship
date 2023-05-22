@@ -13,18 +13,26 @@ const shipCounter = document.getElementById('shipCounter');
 const btnContainer = document.getElementById('btnContainer');
 const nameBox = document.getElementById('nameBox');
 const backgroundMusic = document.getElementById('backgroundMusic');
+const cannonAudio = document.getElementById('cannonAudio');
 const musicContainer = document.getElementById('musicContainer');
 const musicMute = document.getElementById('musicMute');
-
 const playerBoard = new Gameboard(playerGrid, false);
 const playerOne = new Player(playerBoard);
-
 const computerBoard = new Gameboard(computerGrid, true);
 const computer = new Player(computerBoard);
 
-computerBoard.randomlyPlaceShips();
 
 let gameOver = false;
+let musicTimeout;
+let isMuted = false;
+let cannonAudioSrc = '../assets/cannon.mp3';
+
+computerBoard.randomlyPlaceShips();
+//adjust audio and play bg music
+backgroundMusic.play();
+cannonAudio.volume = .4;
+computerBoard.audioSrc = cannonAudioSrc;
+
 // computer.randomAttack(playerBoard)
 
 function victory(pOne, computer) {
@@ -100,7 +108,7 @@ startBtn.addEventListener('click', function() {
     }
 })
 
-let musicTimeout;
+
 function reduceVolume() {
     backgroundMusic.volume -= 0.1;
     if (backgroundMusic.volume >= 0.2) {
@@ -108,14 +116,15 @@ function reduceVolume() {
     }
 }
 
-let isMuted = false;
 musicContainer.addEventListener('click', function() {
     if (!isMuted) {
         musicMute.src = '../assets/music-muted.png';
+        computerBoard.audioSrc = '';
         backgroundMusic.pause();
         isMuted = true;
     } else {
         musicMute.src = '../assets/music-unmuted.png';
+        computerBoard.audioSrc = cannonAudioSrc;
         backgroundMusic.play();
         isMuted = false;
     }
